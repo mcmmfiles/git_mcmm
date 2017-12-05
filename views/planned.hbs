@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+    
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+        <meta charset="utf-8">
+        <title>Map MCMM</title>
+        <style>
+            #right-panel {
+                font-family: 'Roboto','sans-serif';
+                line-height: 30px;
+                padding-left: 10px;
+            }
+
+            #right-panel select, #right-panel input {
+                font-size: 15px;
+            }   
+
+            #right-panel select {
+                width: 100%;
+            }
+
+            #right-panel i {
+                font-size: 14px;
+            }
+
+            html, body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            #right-panel p {
+                font-size: 14px;
+                margin: 0;
+                padding: 0;
+            }
+
+            p {
+                font-size: 14px;
+                margin: 1;
+                padding: 1;
+            }
+
+            li {
+                margin: 0 0 20px 0;
+                padding-left: 7px;
+            }
+
+            #map {
+                height: 100%;
+                float: left;
+                width: 71%;
+                height: 100%;
+            }
+
+            #right-panel {
+                margin: 20px;
+                border-width: 2px;
+                width: 24%;
+                height: 400px;
+                float: left;
+                text-align: left;
+                padding-top: 0;
+            }
+
+            #scrollbox {
+                height:300px;
+                width: 100%;
+                overflow-x: scroll;
+                border: 1px solid rgb(0, 0, 0);
+                border: 1px solid rgba(0, 0, 0, .4);
+            }
+        </style>
+    </head>
+    <body>
+        
+        <div id="map"></div>
+        <div id="right-panel">
+        
+            <div>
+                <b>Planned Routes</b> <br>
+                <input type="radio" name="plan" value="Apple"> Applewood <br>
+                <input type="radio" name="plan" value="Vall"> Valley <br>
+                <input type="radio" name="plan" value="Cresc"> Crescent/Berkshire/North Parkway <br>
+                <input type="radio" name="plan" value="Andre"> Andre/James <br>
+                <input type="radio" name="plan" value="Rel"> MCM Churches <br>
+                <input type="radio" name="plan" value="Edu"> Educational Structures <br>
+                <input type="submit" id="submit" value="Create Route"> <br>
+                <br>
+
+                <b>Route Info</b> <br>
+                <div id="scrollbox">
+                    <ol id="showInfo">
+                    </ol>
+                </div>
+
+                <br><br>
+                <b>Open route in Google Maps</b> <br>
+                
+                <form action="javascript: openMaps()">
+                    <input type="submit" href="" id="openMaps" disabled="disabled" value="Click to Open"> <br>
+                </form>
+                
+
+            </div>
+
+        </div>
+
+
+
+
+        <script>
+            var jsonString = "{{value}}";
+            var myArray = JSON.parse(jsonString.replace(/&quot;/g,'"'));
+
+            function openMaps() {
+                var link = document.getElementById("openMaps").href;
+                console.log(link);
+                window.open(link);
+            }
+
+            function initMap() {
+                var markerArray = [];
+                var polyArray = [];
+                var stepDisplay = new google.maps.InfoWindow;
+                var directionsService = new google.maps.DirectionsService;
+                var map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 12,
+                    center: {lat: 43.618183, lng: -84.234238}
+                });
+                var directionsDisplay = new google.maps.DirectionsRenderer({map: map, suppressInfoWindows: true, suppressMarkers: true, suppressPolylines: true});
+
+                directionsDisplay.setMap(map);
+
+                document.getElementById('submit').addEventListener('click', function() {
+                    calculateAndDisplayRoute(directionsService, directionsDisplay, polyArray, markerArray, stepDisplay, map);
+                });
+            }
+            
+            function calculateAndDisplayRoute(directionsService, directionsDisplay, polyArray, markerArray, stepDisplay, map) {
+                var fullString = createPlan();
+                var waypts = [];
+
+                for (var i = 0; i < polyArray.length; i++) {
+                    polyArray[i].setMap(null);
+                }
+
+                for (var i = 0; i < markerArray.length; i++) {
+                    markerArray[i].setMap(null);
+                }
+
+                for (var i = 1; i < fullString.length; i++) {
+                    waypts.push({
+                    location: fullString[i],
+                    stopover: true
+                    });
+                }
+
+                directionsService.route({
+                    origin: fullString[0],
+                    destination: fullString[fullString.length - 1],
+                    waypoints: waypts,
+                    optimizeWaypoints: true,
+                    travelMode: 'DRIVING'
+                }, function(response, status) {
+                if (status === 'OK') {
+                    directionsDisplay.setDirections(response);
+                    renderDirectionsPolylines(response, polyArray, map);
+                    showSteps(response, markerArray, stepDisplay, map);
+
+                    var route = response.routes[0];                   
+                    var link = "https://www.google.com/maps/dir/";
+                    
+                    for (var i = 0; i < route.legs.length; i++) {
+                        link += route.legs[i].start_address;
+                    }
+
+                    
+                    var edit1 = link.replace(/, USA/g, "/");
+                    var edit2 = edit1.replace(/, /g, "+");
+                    var edit3 = edit2.replace(/\s/g, "+");
+
+                    document.getElementById('openMaps').removeAttribute('disabled');
+                    document.getElementById("openMaps").href = edit3;   
+                } else {
+                    window.alert('Unable to calculate route due to ' + status);
+                }
+                });
+            }
+
+            function renderDirectionsPolylines(response, polyArray, map) {
+                var polyRoute = response.routes[0].legs;
+                for (var i = 0; i < polyRoute.length; i++) {
+                    var nextStep = polyRoute[i].steps;
+                    for (j = 0; j < nextStep.length; j++) {
+                        var nextSegment = nextStep[j].path;
+                        var stepPolyline = new google.maps.Polyline({strokeColor: '#0088FF', strokeWeight: 6, strokeOpacity: 0.6});
+                        for (k = 0; k < nextSegment.length; k++) {
+                            stepPolyline.getPath().push(nextSegment[k]);
+                        }
+                        polyArray.push(stepPolyline);
+                        stepPolyline.setMap(map);
+                    }
+                }
+            }
+
+            function showSteps(response, markerArray, stepDisplay, map) {
+                var markerRoute = response.routes[0];                
+
+                for (var i = 0; i < markerRoute.legs.length; i++) {
+                    var marker = markerArray[i] = markerArray[i] || new google.maps.Marker({label: ""+(i+1), zIndex: 1000 + markerRoute.legs.length - i});
+                    marker.setMap(map);
+                    marker.setPosition(markerRoute.legs[i].start_location);
+                    
+                    var editAddress1 = markerRoute.legs[i].start_address.replace(/, Midland, MI \d{5}/, "");
+                    var editAddress2 = editAddress1.replace(/, USA/g, "");
+                    var info;
+                    var listInfo = editAddress2 ;
+
+                    if ( stepDisplay != null ) {
+                        stepDisplay.close();
+                    }
+
+                    Object.entries(myArray).forEach(
+                    ([key, value]) => { 
+                        if (value.property_address == editAddress2) {
+                            if (value.property_name == "" || value.building_type == "Residential") {
+                                info = "<p><b>" + value.property_address + "</b></p>";
+                                listInfo = "<b>" + value.property_address + "</b><br>";
+                            }
+                            else if (value.property_name != "" && value.building_type != "Residential") {
+                                info = "<p><b>" + value.property_address + "</b> - " + value.property_name + "</p>";
+                                listInfo = "<b>" + value.property_address + "</b><br>" + value.property_name + "<br>";
+                            }
+                            
+                            if (value.building_type != "" && value.building_type != "Religious" && value.building_type != "Educational") {
+                                if (value.year_built == "" && value.architect != "") {
+                                    info +=  "<b>Architect</b> - " + value.architect + " | " + "<b>Structure Type</b> - " + value.building_type;
+                                    listInfo +=  "Architect - " + value.architect + "<br>" + "Structure Type - " + value.building_type;
+                                }
+                                if (value.year_built != "" && value.architect == "") {
+                                    info +=  "<b>Year Built</b> - " + value.year_built + " | " + "<b>Structure Type</b> - " + value.building_type;
+                                    listInfo +=  "Year Built - " + value.year_built + "<br>" + "Structure Type - " + value.building_type;
+                                }
+                                if (value.year_built != "" && value.architect != "") {
+                                    info +=  "<b>Year Built</b> - " + value.year_built + " | " + "<b>Architect</b> - " + value.architect + " | " + "<b>Structure Type</b> - " + value.building_type;
+                                    listInfo +=  "Year Built - " + value.year_built + "<br>" + "Architect - " + value.architect + "<br>" + "Structure Type - " + value.building_type;
+                                }
+                                if (value.year_built == "" && value.architect == "") {
+                                    info +=  "<b>Structure Type</b> - " + value.building_type;
+                                    listInfo +=  "Structure Type - " + value.building_type;
+                                }   
+                            }
+
+                            else if (value.building_type == "" || value.building_type == "Religious" || value.building_type == "Educational") {
+                                if (value.year_built == "" && value.architect != "") {
+                                    info += "<b>Architect</b> - " + value.architect;
+                                    listInfo += "Architect - " + value.architect;
+                                }
+                                if (value.year_built != "" && value.architect == "") {
+                                    info +=  "<b>Year Built</b> - " + value.year_built;
+                                    listInfo +=  "Year Built - " + value.year_built;
+                                }
+                                if (value.year_built != "" && value.architect != "") {
+                                    info +=  "<b>Year Built</b> - " + value.year_built + " | " + "<b>Architect</b> - " + value.architect;
+                                    listInfo +=  "Year Built - " + value.year_built + "<br>" + "Architect - " + value.architect;
+                                }   
+                            }
+                        }
+                    });
+
+                    if (editAddress2 == "3811 Valley Dr") {
+                        info = "<p><b>3811 Valley Dr</b></p><b>Structure Type</b>: Residential"
+                        listInfo = "<b>3811 Valley Dr</b><br>Structure Type: Residential";
+                    }
+
+                    if (editAddress2 == "5500 Drake St") {
+                        info = "<p><b>5500 Drake St</b> - Woodcrest Elementary</p>"
+                        listInfo = "<b>5500 Drake St</b><br>Woodcrest Elementary";
+                    }
+
+                    if (editAddress2 == "800 W Chapel Ln") {
+                        info = "<p><b>800 W Chapel Ln</b> - Jefferson Middle School</p>"
+                        listInfo = "<b>800 W Chapel Ln</b><br>Jefferson Middle School";
+                    }
+
+                    if (typeof info === "undefined") {
+                        info = "<b>" + editAddress2 + "</b>";
+                    }
+
+                    var list = document.createElement("li");
+                    list.innerHTML = listInfo;
+                    showInfo.appendChild(list);
+
+                    attachText(stepDisplay, marker, info, map);
+                }
+
+                var markerBounds = new google.maps.LatLngBounds();
+
+                for (var j = 0; j < marker.length; j++) {
+                    markerBounds.extend(marker[j].getPosition());
+                }
+
+                map.fitBounds(markerBounds);
+            }
+
+            function attachText(stepDisplay, marker, text, map) {
+                google.maps.event.addListener(marker, 'click', function() {
+                    stepDisplay.setContent(text);
+                    stepDisplay.open(map, marker);
+                });
+            }
+
+
+            function createPlan() {
+                var whatPlan = getPlan();
+                var showInfo = document.getElementById("showInfo");
+
+                if (showInfo) {
+                    while (showInfo.firstChild) {
+                        showInfo.removeChild(showInfo.firstChild);
+                    }
+                }
+                
+                var apple = ["3108 Applewood", "3200 Applewood", "3205 Applewood", "3300 Applewood", "3400 Applewood", "3410 Applewood", "3418 Applewood", "3419 Applewood", "3711 Applewood", "3812 Applewood"],
+                    valley = ["3124 Valley", "3210 Valley", "3211 Valley", "3302 Valley", "3315 Valley", "3403 Valley", "3411 Valley", "3600 Valley", "3610 Valley", "3701 Valley", "3716 Valley", "3802 Valley", "3811 Valley", "3900 Valley", "3909 Valley"],
+                    crescent = ["512 Crescent", "1200 N Parkway", "1317 N Parkway", "1413 Crescent", "809 Crescent", "912 Crescent", "4300 Berkshire Ct", "4200 Berkshire Ct", "4104 Berkshire Ct", "4105 Berkshire Ct", "801 Crescent", "717 Crescent", "713 Crescent", "612 Crescent", "604 Crescent", "1208 Crescent",  "1300 Crescent", "1412 N Parkway"],
+                    andre = ["1108 Willard", "4500 Andre", "4509 Andre", "4416 Andre", "4402 Andre", "4311 Andre", "4405 James", "4415 James", "4503 James", "4310 James"],
+                    rel = ["315 W Larkin St", "501 Hillcrest Rd", "5501 Jefferson Ave", "1605 E Ashman St", "915 E Sugnet Rd", "505 E Carpenter St", "510 E St Andrews Rd", "4611 Swede Ave", "4100 Chestnut Hill Dr"],
+                    edu = ["3901 N Saginaw Rd", "800 W Chapel Ln", "1105 E Sugnet", "5500 Drake St", "1305 E Sugnet"],
+                    fullString = [];
+
+                    
+                
+                
+                if (whatPlan == "Apple") {
+                    for (i=0; i<apple.length; i++) {
+                        fullString.push(apple[i] + ", Midland, MI");
+                    }
+                }
+                if (whatPlan == "Vall") {
+                    for (i=0; i<valley.length; i++) {
+                        fullString.push(valley[i] + ", Midland, MI");
+                    }
+                }
+                if (whatPlan == "Cresc") {
+                    for (i=0; i<crescent.length; i++) {
+                        fullString.push(crescent[i] + ", Midland, MI");
+                    }
+                }
+                if (whatPlan == "Andre") {
+                    for (i=0; i<andre.length; i++) {
+                        fullString.push(andre[i] + ", Midland, MI");
+                    }
+                }
+                if (whatPlan == "Rel") {
+                    for (i=0; i<rel.length; i++) {
+                        fullString.push(rel[i] + ", Midland, MI");
+                    }
+                }
+                if (whatPlan == "Edu") {
+                    for (i=0; i<edu.length; i++) {
+                        fullString.push(edu[i] + ", Midland, MI");
+                    }
+                }
+
+                return fullString;   
+            }
+
+            
+            function getPlan() {
+                var planSelected = document.getElementsByName('plan');
+                var whatPlan = [];
+
+                for (var i=0; i<planSelected.length; i++) {
+                    if (planSelected[i].checked) {
+                        whatPlan.push(planSelected[i].value);
+                    }
+                }
+
+                return whatPlan;
+            }
+
+        </script>
+        <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDM31peI5VTtUUY-w28K6hIXDy0QW2fRqA&callback=initMap">
+        </script>
+    </body>
+</html>
