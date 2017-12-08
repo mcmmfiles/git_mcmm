@@ -11,6 +11,25 @@
                 font-family: 'Roboto','sans-serif';
                 line-height: 30px;
                 padding-left: 10px;
+                padding-top: 15px;
+                margin: 20px;
+                margin-top: 0px;
+                border-width: 2px;
+                width: 24%;
+                height: 400px;
+                float: left;
+                text-align: left;
+            }
+
+            #map {
+                float: left;
+                width: 71%;
+                height: 100%;
+            }
+
+            #heading {
+                font-size: 19px;
+                margin-bottom: 0px;
             }
 
             #right-panel select, #right-panel input {
@@ -21,12 +40,10 @@
                 width: 100%;
             }
 
-            #right-panel i {
-                font-size: 14px;
-            }
 
             html, body {
                 height: 100%;
+                font-size: 18px;
                 margin: 0;
                 padding: 0;
             }
@@ -38,31 +55,18 @@
             }
 
             p {
-                font-size: 14px;
+                font-size: 16px;
                 margin: 1;
                 padding: 1;
+            }
+
+            a {
+                font-size: 15px;
             }
 
             li {
                 margin: 0 0 20px 0;
                 padding-left: 7px;
-            }
-
-            #map {
-                height: 100%;
-                float: left;
-                width: 71%;
-                height: 100%;
-            }
-
-            #right-panel {
-                margin: 20px;
-                border-width: 2px;
-                width: 24%;
-                height: 400px;
-                float: left;
-                text-align: left;
-                padding-top: 0;
             }
 
             #scrollbox {
@@ -72,6 +76,7 @@
                 border: 1px solid rgb(0, 0, 0);
                 border: 1px solid rgba(0, 0, 0, .4);
             }
+
         </style>
     </head>
     <body>
@@ -80,29 +85,29 @@
         <div id="right-panel">
         
             <div>
-                <b>Planned Routes</b> <br>
+                <div id="heading"><b>Routes</b></div>
                 <input type="radio" name="plan" value="Apple"> Applewood <br>
                 <input type="radio" name="plan" value="Vall"> Valley <br>
                 <input type="radio" name="plan" value="Cresc"> Crescent/Berkshire/North Parkway <br>
                 <input type="radio" name="plan" value="Andre"> Andre/James <br>
                 <input type="radio" name="plan" value="Rel"> MCM Churches <br>
                 <input type="radio" name="plan" value="Edu"> Educational Structures <br>
-                <input type="submit" id="submit" value="Create Route"> <br>
-                <br>
+                <input type="submit" id="submit" value="Create Route" style="border: 1px solid #999999; background: rgb(253, 252, 255); border-radius: 5px; text-align: center; font-size: 14px; height: 26px; width:115px; margin-top:7px;">
+                <br><br>
 
-                <b>Route Info</b> <br>
+                <div id="heading"><b>Route Info</b></div>
                 <div id="scrollbox">
                     <ol id="showInfo">
                     </ol>
                 </div>
 
                 <br><br>
-                <b>Open route in Google Maps</b> <br>
+                <div id="heading"><b>Open route in Google Maps</b></div>
                 
                 <form action="javascript: openMaps()">
-                    <input type="submit" href="" id="openMaps" disabled="disabled" value="Click to Open"> <br>
+                    <input type="submit" href="" id="openMaps" disabled="disabled" value="Click to Open" style="border: 1px solid #999999; background: rgb(253, 252, 255); border-radius: 5px; text-align: center; font-size: 14px; height: 26px; width:118px; margin-top:7px;">  <br>
                 </form>
-                
+                <br>
 
             </div>
 
@@ -114,6 +119,8 @@
         <script>
             var jsonString = "{{value}}";
             var myArray = JSON.parse(jsonString.replace(/&quot;/g,'"'));
+
+            detectBrowser();
 
             function openMaps() {
                 var link = document.getElementById("openMaps").href;
@@ -229,16 +236,22 @@
                             if (value.property_name == "" || value.building_type == "Residential") {
                                 info = "<p><b>" + value.property_address + "</b></p>";
                                 listInfo = "<b>" + value.property_address + "</b><br>";
+                                if (value.image_link != "") {
+                                    info += "<a href=" + value.image_link + " target=_blank>Open image in new window</a><br><br>";
+                                }
                             }
                             else if (value.property_name != "" && value.building_type != "Residential") {
                                 info = "<p><b>" + value.property_address + "</b> - " + value.property_name + "</p>";
                                 listInfo = "<b>" + value.property_address + "</b><br>" + value.property_name + "<br>";
+                                if (value.image_link != "") {
+                                    info += "<a href=" + value.image_link + " target=_blank>Open image in new window</a><br><br>";
+                                }
                             }
                             
                             if (value.building_type != "" && value.building_type != "Religious" && value.building_type != "Educational") {
                                 if (value.year_built == "" && value.architect != "") {
-                                    info +=  "<b>Architect</b> - " + value.architect + " | " + "<b>Structure Type</b> - " + value.building_type;
-                                    listInfo +=  "Architect - " + value.architect + "<br>" + "Structure Type - " + value.building_type;
+                                    info += "<b>Architect</b> - " + value.architect + " | " + "<b>Structure Type</b> - " + value.building_type;
+                                    listInfo +=  "Architect - " + value.architect_first_name + " " + value.architect + "<br>" + "Structure Type - " + value.building_type;
                                 }
                                 if (value.year_built != "" && value.architect == "") {
                                     info +=  "<b>Year Built</b> - " + value.year_built + " | " + "<b>Structure Type</b> - " + value.building_type;
@@ -246,7 +259,7 @@
                                 }
                                 if (value.year_built != "" && value.architect != "") {
                                     info +=  "<b>Year Built</b> - " + value.year_built + " | " + "<b>Architect</b> - " + value.architect + " | " + "<b>Structure Type</b> - " + value.building_type;
-                                    listInfo +=  "Year Built - " + value.year_built + "<br>" + "Architect - " + value.architect + "<br>" + "Structure Type - " + value.building_type;
+                                    listInfo +=  "Year Built - " + value.year_built + "<br>" + "Architect - " + value.architect_first_name + " " + value.architect + "<br>" + "Structure Type - " + value.building_type;
                                 }
                                 if (value.year_built == "" && value.architect == "") {
                                     info +=  "<b>Structure Type</b> - " + value.building_type;
@@ -257,7 +270,7 @@
                             else if (value.building_type == "" || value.building_type == "Religious" || value.building_type == "Educational") {
                                 if (value.year_built == "" && value.architect != "") {
                                     info += "<b>Architect</b> - " + value.architect;
-                                    listInfo += "Architect - " + value.architect;
+                                    listInfo += "Architect - " + value.architect_first_name + " " + value.architect;
                                 }
                                 if (value.year_built != "" && value.architect == "") {
                                     info +=  "<b>Year Built</b> - " + value.year_built;
@@ -265,7 +278,7 @@
                                 }
                                 if (value.year_built != "" && value.architect != "") {
                                     info +=  "<b>Year Built</b> - " + value.year_built + " | " + "<b>Architect</b> - " + value.architect;
-                                    listInfo +=  "Year Built - " + value.year_built + "<br>" + "Architect - " + value.architect;
+                                    listInfo +=  "Year Built - " + value.year_built + "<br>" + "Architect - " + value.architect_first_name + " " + value.architect;
                                 }   
                             }
                         }
@@ -324,10 +337,10 @@
                     }
                 }
                 
-                var apple = ["3108 Applewood", "3200 Applewood", "3205 Applewood", "3300 Applewood", "3400 Applewood", "3410 Applewood", "3418 Applewood", "3419 Applewood", "3711 Applewood", "3812 Applewood"],
-                    valley = ["3124 Valley", "3210 Valley", "3211 Valley", "3302 Valley", "3315 Valley", "3403 Valley", "3411 Valley", "3600 Valley", "3610 Valley", "3701 Valley", "3716 Valley", "3802 Valley", "3811 Valley", "3900 Valley", "3909 Valley"],
-                    crescent = ["512 Crescent", "1200 N Parkway", "1317 N Parkway", "1413 Crescent", "809 Crescent", "912 Crescent", "4300 Berkshire Ct", "4200 Berkshire Ct", "4104 Berkshire Ct", "4105 Berkshire Ct", "801 Crescent", "717 Crescent", "713 Crescent", "612 Crescent", "604 Crescent", "1208 Crescent",  "1300 Crescent", "1412 N Parkway"],
-                    andre = ["1108 Willard", "4500 Andre", "4509 Andre", "4416 Andre", "4402 Andre", "4311 Andre", "4405 James", "4415 James", "4503 James", "4310 James"],
+                var apple = ["3108 Applewood Rd", "3200 Applewood Rd", "3205 Applewood Rd", "3300 Applewood Rd", "3400 Applewood Rd", "3410 Applewood Rd", "3418 Applewood Rd", "3419 Applewood Rd", "3711 Applewood Rd", "3812 Applewood Rd"],
+                    valley = ["3124 Valley Dr", "3210 Valley Dr", "3211 Valley Dr", "3302 Valley Dr", "3315 Valley Dr", "3403 Valley Dr", "3411 Valley Dr", "3600 Valley Dr", "3610 Valley Dr", "3701 Valley Dr", "3716 Valley Dr", "3802 Valley Dr", "3811 Valley Dr", "3900 Valley Dr", "3909 Valley Dr"],
+                    crescent = ["512 Crescent Dr", "1200 N Parkway Dr", "1317 N Parkway Dr", "1413 Crescent Dr", "809 Crescent Dr", "912 Crescent Dr", "4300 Berkshire Ct", "4200 Berkshire Ct", "4104 Berkshire Ct", "4105 Berkshire Ct", "801 Crescent Dr", "717 Crescent Dr", "713 Crescent Dr", "612 Crescent Dr", "604 Crescent Dr", "1208 Crescent Dr",  "1300 Crescent Dr", "1412 N Parkway Dr"],
+                    andre = ["1108 Willard St", "4500 Andre St", "4509 Andre St", "4416 Andre St", "4402 Andre St", "4311 Andre St", "4405 James Dr", "4415 James Dr", "4503 James Dr", "4310 James Dr"],
                     rel = ["315 W Larkin St", "501 Hillcrest Rd", "5501 Jefferson Ave", "1605 E Ashman St", "915 E Sugnet Rd", "505 E Carpenter St", "510 E St Andrews Rd", "4611 Swede Ave", "4100 Chestnut Hill Dr"],
                     edu = ["3901 N Saginaw Rd", "800 W Chapel Ln", "1105 E Sugnet", "5500 Drake St", "1305 E Sugnet"],
                     fullString = [];
@@ -380,8 +393,30 @@
                     }
                 }
 
+                if (whatPlan.length == 0) {
+                    alert("No route selected");
+                    return;
+                }
+
                 return whatPlan;
             }
+
+            function detectBrowser() {
+                var useragent = navigator.userAgent;
+                var mapdiv = document.getElementById("map");
+                var paneldiv = document.getElementById("right-panel");
+                var scrollbox = document.getElementById("scrollbox");
+
+                if (useragent.indexOf('iPhone') != -1 || useragent.indexOf('Android') != -1 ) {
+                    mapdiv.style.width = '100%';
+                    mapdiv.style.height = '100%';
+                    paneldiv.style.width = '100%';
+                    paneldiv.style.height = '100%';
+                    paneldiv.style.margin = '2px';
+                    scrollbox.style.width = '90%';
+                } 
+            }
+            
 
         </script>
         <script async defer

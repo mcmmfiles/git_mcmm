@@ -7,37 +7,68 @@
         <meta charset="utf-8">
         <title>Map MCMM</title>
         <style>
-            #right-panel {
-                font-family: 'Roboto','sans-serif';
-                line-height: 26px;
-                padding-left: 10px;
+
+            html, body {
+                height: 100%;
+                font-size: 18px;
+                margin: 0;
+                padding: 0;
             }
 
-            #right-panel select, #right-panel input {
-                font-size: 15px;
-            }   
+            #right-panel {
+                font-family: 'Roboto','sans-serif';
+                line-height: 25px;
+                padding-left: 10px;
+                padding-top: 15px;
+                margin: 20px;
+                margin-top: 0px;
+                border-width: 2px;
+                width: 28%;
+                height: 400px;
+                float: left;
+                text-align: left; 
+            }
 
-            #right-panel select {
+            #map {
+                float: left;
+                width: 67%;
+                height: 100%;
+            }
+
+            #waypoints {
+                height: 300px;
+                margin-bottom: 5px;
+                font-size: 15px;
                 width: 100%;
-                overflow-x: scroll;  
+                overflow: scroll; 
             }
 
             #right-panel option {
                 width: 140%;
                 height: 20px;
-                padding: 5px;  
+                padding: 5px; 
+            }
+
+            #heading {
+                font-size: 19px;
+                margin-bottom: 0px;
             }
 
             p {
-                font-size: 14px;
+                font-size: 15px;
                 margin: 1;
                 padding: 1;
+            }
+
+            a {
+                font-size: 15px;
             }
 
             button {
                 border: 1px solid #999999;
                 background-color: #cccccc3d;
                 color: #000000;
+                border-radius: 5px;
             }
 
             button:disabled,
@@ -53,36 +84,9 @@
             }
 
             #right-panel i {
-                font-size: 14px;
+                font-size: 15px;
                 margin: 0;
                 padding: 0;
-            }
-
-            html, body {
-                height: 100%;
-                margin: 0;
-                padding: 0;
-            }
-
-            #map {
-                height: 100%;
-                float: left;
-                width: 71%;
-                height: 100%;
-            }
-
-            #right-panel {
-                margin: 20px;
-                border-width: 2px;
-                width: 24%;
-                height: 400px;
-                float: left;
-                text-align: left;
-                padding-top: 0;
-            }
-
-            #waypoints {
-                height: 300px;
             }
 
         </style>
@@ -92,8 +96,8 @@
         <div id="map"></div>
         <div id="right-panel">
         
-            <div>
-                <b>Structure Types</b> <br>
+            <div id="scrollDiv">
+                <div id="heading"><b>Structure Types</b></div>
                 <input type="checkbox" checked onclick="javascript: createOptions()" name="typeBox" value="public"> Public <br>
                 <input type="checkbox" checked onclick="javascript: createOptions()" name="typeBox" value="religious"> Religious <br>
                 <input type="checkbox" checked onclick="javascript: createOptions()" name="typeBox" value="educational"> Educational <br>
@@ -101,7 +105,7 @@
                 <input type="checkbox" checked onclick="javascript: createOptions()" name="typeBox" value="residential"> Residential <br>
                 <br>
                 
-                <b>Route Options</b> <br>
+                <div id="heading"><b>Route Options</b></div>
                 <i>Select up to 24 locations</i> <br>
                 <i>Shift+Click for multiple selection</i> <br>
                 <i>Ctrl+Click or Cmd+Click for single selection</i> <br>
@@ -110,16 +114,20 @@
                 <button id="abutton" onClick="javascript: archClicked() & createOptions()">Sort by<br/>architect</button>
                 <button id="tbutton" onClick="javascript: typeClicked() & createOptions()">Sort by<br/>structure type</button>
                 
-                <select multiple id="waypoints">
-                </select> <br>
+                <div id="selectBox">
+                    <select multiple id="waypoints">
+                    </select> 
+                </div>
 
-                <input type="submit" id="submit" value="Create Route">
+                <input type="submit" id="submit" value="Create Route" style="border: 1px solid #999999; background: rgb(253, 252, 255); border-radius: 5px; font-size: 14px; height: 26px; width:115px; margin-top:5px; margin-bottom:15px;">
 
-                <br><br> <br>
-                <b>Open route in Google Maps</b> <br>
+                <br><br>
+                <div id="heading"><b>Open route in Google Maps</b></div>
+
                 <form action="javascript: openMaps()">
-                    <input type="submit" href="" id="openMaps" disabled="disabled" value="Click to Open"> <br>
+                    <input type="submit" href="" id="openMaps" disabled="disabled" value="Click to Open" style="border: 1px solid #999999; background: rgb(253, 252, 255); border-radius: 5px; font-size: 14px; height: 26px; width:118px; margin-top:5px;"> <br>
                 </form>
+                <br>
 
             </div>
 
@@ -130,6 +138,9 @@
         <script>
             document.getElementById("rbutton").disabled = true;
             var select = document.getElementById('waypoints');
+
+            detectBrowser()
+
             Object.entries(myArray).forEach(
             ([key, value]) => { 
                 var opt = document.createElement('option');
@@ -165,10 +176,18 @@
                         opt.innerHTML =  value.property_address;
                     }   
                 }
+
+                if (value.property_address == "2927 Manor Dr" || value.property_address == "2923 Manor Dr") {
+                    opt.innerHTML =  value.property_address + " | " + value.architect + " | " + "Comm/Ind";
+                }
                 
+                if (value.property_address == "4300 Sherwood Ct") {
+                    opt.innerHTML =  value.property_address + " | " + value.year_built + " | " + value.architect + " | " + "Res";
+                }
+
                 select.appendChild(opt);  
             });
-            
+
 
             function openMaps() {
                 var link = document.getElementById("openMaps").href;
@@ -203,6 +222,8 @@
                 document.getElementById("abutton").disabled = false;
                 document.getElementById("tbutton").disabled = true;
             }
+
+            
 
             function initMap() {
                 var markerArray = [];
@@ -348,7 +369,8 @@
                     }
 
                     if (editAddress2 == "Midland County Administration Building, 220 W Ellsworth St") {
-                        info = "<p><b>220 W Ellsworth St</b> - Midland County Administration Building</p>Public";
+                        info = "<p><b>220 W Ellsworth St</b> - Midland County Administration Building</p>" +
+                        "<a href=https://firebasestorage.googleapis.com/v0/b/mcmm-database.appspot.com/o/220%20W%20Ellsworth%20St.jpg?alt=media&token=41c754a0-9ad2-40c3-835b-c998e59ba058 target=_blank>Open image in new window</a><br><p>Public</p>";
                     }
 
                     Object.entries(myArray).forEach(
@@ -356,35 +378,41 @@
                         if (value.property_address == editAddress2) {
                             if (value.property_name == "") {
                                 info = "<p><b>" + value.property_address + "</b></p>";
+                                if (value.image_link != "") {
+                                    info += "<a href=" + value.image_link + " target=_blank>Open image in new window</a><br>";
+                                }
                             }
                             else if (value.property_name != "") {
                                 info = "<p><b>" + value.property_address + "</b> - " + value.property_name + "</p>";
+                                if (value.image_link != "") {
+                                    info += "<a href=" + value.image_link + " target=_blank>Open image in new window</a><br>";
+                                }
                             }
                             
                             if (value.building_type != "") {
                                 if (value.year_built == "" && value.architect != "") {
-                                    info +=  value.architect + " | " + value.building_type;
+                                    info += "<p>" + value.architect + " | " + value.building_type + "</p>";
                                 }
                                 if (value.year_built != "" && value.architect == "") {
-                                    info +=  value.year_built + " | " + value.building_type;
+                                    info += "<p>" + value.year_built + " | " + value.building_type + "</p>";
                                 }
                                 if (value.year_built != "" && value.architect != "") {
-                                    info +=  value.year_built + " | " + value.architect + " | " + value.building_type;
+                                    info += "<p>" + value.year_built + " | " + value.architect + " | " + value.building_type + "</p>";
                                 }
                                 if (value.year_built == "" && value.architect == "") {
-                                    info +=  value.building_type;
+                                    info += "<p>" + value.building_type + "</p>";
                                 }   
                             }
 
                             else if (value.building_type == "") {
                                 if (value.year_built == "" && value.architect != "") {
-                                    info +=  value.architect;
+                                    info += "<p>" + value.architect + "</p>";
                                 }
                                 if (value.year_built != "" && value.architect == "") {
-                                    info +=  value.year_built;
+                                    info += "<p>" + value.year_built + "</p>";
                                 }
                                 if (value.year_built != "" && value.architect != "") {
-                                    info +=  value.year_built + " | " + value.architect;
+                                    info += "<p>" + value.year_built + " | " + value.architect + "</p>";
                                 }   
                             }
                         }
@@ -412,8 +440,6 @@
                     stepDisplay.open(map, marker);
                 });
             }
-
-
             
 
             function createOptions() {
@@ -454,6 +480,14 @@
                         if (value.year_built == "" && value.architect == "") {
                             opt.innerHTML =  value.property_address;
                         }   
+                    }
+
+                    if (value.property_address == "2927 Manor Dr" || value.property_address == "2923 Manor Dr") {
+                        opt.innerHTML =  value.property_address + " | " + value.architect + " | " + "Comm/Ind";
+                    }
+                    
+                    if (value.property_address == "4300 Sherwood Ct") {
+                        opt.innerHTML =  value.property_address + " | " + value.year_built + " | " + value.architect + " | " + "Res";
                     }
 
 
@@ -763,9 +797,24 @@
                     }
                 }
 
-                
                 return typesChecked;
-                
+            }
+
+            function detectBrowser() {
+                var useragent = navigator.userAgent;
+                var mapdiv = document.getElementById("map");
+                var paneldiv = document.getElementById("right-panel");
+                var waypointsdiv = document.getElementById("waypoints");
+
+                if (useragent.indexOf('iPhone') != -1 || useragent.indexOf('Android') != -1 ) {
+                    mapdiv.style.width = '100%';
+                    mapdiv.style.height = '100%';
+                    paneldiv.style.width = '100%';
+                    paneldiv.style.height = '100%';
+                    paneldiv.style.margin = '2px';
+                    waypointsdiv.style.height = '50px';
+                    waypointsdiv.style.width = '95%';
+                }   
             }
 
         </script>

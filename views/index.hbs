@@ -8,30 +8,174 @@
 
     <style>
         body {
-            background-color: #C6E0F8;
+            display: flex;
+            height: 100%;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            background-color: rgb(226, 241, 250);
             font-family: 'Roboto', Arial, sans-serif;
         }
 
-        #one {
+        #heading {
+            font-size: 17px;
+            padding-left: 30px;
+            padding-right: 30px;
+            display: flex;  
+            justify-content: center;
+            background-color: rgb(145, 197, 243);
+        }     
+
+        #main-column {  
+            padding-left: 35px;
+            padding-right: 35px;
+            padding-top: 20px;
+            padding-bottom: 20px;
+            margin-left: 0px;
+            margin-right: 10px;
+            margin-top: 0px;
+            margin-bottom: 0px; 
+            background-color: #C6E0F8;
+            border: 1px solid #999999bb   
+        }
+
+        #intro {
+            line-height: 30px;
+            padding: 0px;
+            margin-left: 10px; 
+            width: 500px;
+        }
+
+        p {
+            font-size: 19px;
+        }
+
+        a {
             font-size: 18px;
-            width: 100%;
+        }
+
+        #heading2 {
+            font-size: 18px;
+            padding: 0px;
+            padding-top: 30px;
+            margin-left: 21px; 
+            background-color: #C6E0F8; 
+        }
+
+        #select-column {
+            padding: 0px;
+            margin-left: 35px;
+            font-size: 21px;
+            background-color: #C6E0F8;
             color: rgba(0,0,0);
             color: rgba(0,0,0, 0.90);  
         }
 
-        #scrollbox {
-            height:85px;
-            width: 248px;
-            overflow-x: scroll;
-            border: 1px solid;
+        #headSelect {
+            font-size: 23px;
+            padding: 0px;
+            margin-bottom: 20px;
         }
+
+        #addSelect {
+            font-size: 20px;
+            padding: 0px;
+            margin-left: 3px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        #arch {
+            line-height: 23px;
+            background-color: rgb(145, 197, 243);
+            margin:0;
+            padding-left: 18px;
+            padding-right: 17px;
+            padding-top: 18px;
+            padding-bottom: 23px;
+            width: 370px;
+        }
+
+        #dec {
+            line-height: 23px;
+            background-color: rgb(145, 197, 243);
+            padding-left: 18px;
+            padding-right: 17px;
+            padding-top: 18px;
+            padding-bottom: 23px;
+            width: 370px;
+        }
+
+        #scrollbox {
+            background-color: rgb(129, 180, 219);
+            padding-left: 8px;
+            padding-right: 8px;
+            padding-top: 11px;
+            padding-bottom: 11px;
+            height: 116px;
+            width: 87%;
+            overflow-x: scroll;
+            border: 1px solid rgba(0, 0, 0);
+            border: 1px solid rgba(0, 0, 0, 0.377);
+        }
+
+        input[type=checkbox] {
+            margin-right: 10px;
+            float: left;
+            outline: none;
+            width: 24px;
+            height: 18px;
+            display: block;
+            font-weight: bold;
+            border-radius: 3px;
+            border: 1px solid #B9B9B9;
+            -webkit-appearance: none;
+
+            background-image: -webkit-gradient( 
+                linear, left top, left bottom,
+                color-stop(1, #FDFDFD)
+            );
+            box-shadow: 0px 1px 2px #AFAFAF inset;
+            color: #7F7F7F;
+        }
+
+        input[type=checkbox]:checked {
+            background-image: -webkit-gradient( 
+                linear, left top, left bottom,
+                color-stop(1, rgb(3, 97, 247))
+            );
+            box-shadow: 0px 1px 2px #1449A3 inset;
+            color: #fff;
+            text-shadow: 0px -1px 1px #000;
+            border: 1px solid #99B9E8;
+        }
+
+        .button {
+            display: block;
+            width: 240px;
+            height: 10px;
+            background: rgb(232, 229, 236);
+            padding-top: 4px;
+            padding-bottom: 23px;
+            padding-left: 10px;
+            padding-right: 10px;
+            text-align: center;
+            border-radius: 5px;
+            border: 1px solid #afadad;
+            color: black;
+            text-decoration: none;
+        }
+
     </style>
+
 
 
     <script type="text/javascript">                         
         var jsonString = "{{value}}";
         var getData = JSON.parse(jsonString.replace(/&quot;/g,'"'));
         var jsonData = [];   
+
 
         Object.entries(getData).forEach(
         ([key, value]) => {      
@@ -202,7 +346,7 @@
             }
             
             return decsChecked;
-        }
+        }        
         
     </script>
 
@@ -210,83 +354,100 @@
 
 
 
+<meta name="viewport" content="width=device-height, initial-scale=1">
+<div id="main-column">
 <body>
-    <h1>Welcome to Map MCM Midland</h1>
-    <p>
-        Explore the unique architectural heritage of Mid-Century Modern in Midland, MI. <br>
-        Click the link below to view planned routes representing a great variety of MCM <br> 
-        architecture in Midland, or create a custom route. 
-    </p>
-    <a href="/planned" target="_blank">View Planned Routes</a>
-    <br>
+    
+        <div id="heading">
+            <h1>Mid-Century Modern Midland</h1>
+        </div>
 
-    <div id="one">
-        <form action="javascript: sendArray()"> 
+        <div id="intro">
+            <p>
+                Explore the unique architectural heritage of Mid-Century Modern in Midland, MI.
+                Click the button below to view routes between structures representing a
+                great variety of MCM architecture in Midland, or create a custom route. 
+            </p>
+            <a href="/planned" class="button" target="_blank">View Recommended Routes</a>
+        </div>
+
+        <div id="heading2">
             <h2>Route by Architect and Decade</h2>
+        </div>
 
-            <b>Mid-Century Modern Architects</b> <br> 
-            <br>
+        <div id="select-column">
+            <form action="javascript: sendArray()"> 
+                
+                <div id="arch">
+                    <div id="headSelect">
+                        <b>Mid-Century Modern Architects</b>
+                    </div>
 
-            <input type="checkbox" onClick="archToggle(this)"> Any Architect <br>
-            <input type="checkbox" name="archBox" value="Dow"> Alden B. Dow <br>    
-            <input type="checkbox" name="archBox" value="Warner"> Francis Warner <br>  
-            <input type="checkbox" name="archBox" value="Hallett"> Jackson Hallett <br> 
-            <input type="checkbox" name="archBox" value="Beach"> Glen Beach <br>      
-            <input type="checkbox" name="archBox" value="Schwartz"> Robert Schwartz <br>       
-            <input type="checkbox" name="archBox" value="Schulwitz"> C.G. Schulwitz <br>
-            <input type="checkbox" name="archBox" value="Schwartz/Blacklock"> Schwartz and Blacklock <br>
-            <input type="checkbox" name="archBox" value="" style="opacity:0; position:absolute; left:100px">
+                    <div><input type="checkbox" onClick="archToggle(this)"> Any Architect </div><br>
+                    <div><input type="checkbox" name="archBox" value="Dow"> Alden B. Dow </div><br>
+                    <div><input type="checkbox" name="archBox" value="Warner"> Francis Warner </div><br>  
+                    <div><input type="checkbox" name="archBox" value="Hallett"> Jackson Hallett </div><br> 
+                    <div><input type="checkbox" name="archBox" value="Beach"> Glen Beach </div><br>      
+                    <div><input type="checkbox" name="archBox" value="Schwartz"> Robert Schwartz </div><br>       
+                    <div><input type="checkbox" name="archBox" value="Schulwitz"> C.G. Schulwitz </div><br>
+                    <div><input type="checkbox" name="archBox" value="Schwartz/Blacklock"> Schwartz and Blacklock </div>
+                    <input type="checkbox" name="archBox" value="" style="opacity:0; position:absolute; left:100px">
+                    
+                    <div id="addSelect">
+                        <i><b> Additional Architects <br> (3 structures or less per architect)</b></i>
+                    </div>
+                    
+                    <div onmouseover="document.body.style.overflow='hidden';" onmouseout="document.body.style.overflow='auto';" id="scrollbox">
+                        <div><input type="checkbox" name="archBox" value="Schwartz/Beach"> Schwartz/Beach </div><br>
+                        <div><input type="checkbox" name="archBox" value="Hallett/Saro"> Hallett/Saro </div><br>
+                        <div><input type="checkbox" name="archBox" value="Goodall"> Robert Goodall </div><br>
+                        <div><input type="checkbox" name="archBox" value="Allison"> Cle Allison </div><br>
+                        <div><input type="checkbox" name="archBox" value="Goodall/Beach"> Goodall/Beach </div><br>
+                        <div><input type="checkbox" name="archBox" value="Schulwitz/Virgo"> Schulwitz/Virgo </div><br>
+                        <div><input type="checkbox" name="archBox" value="Nurmi"> S.A. Nurmi </div><br>
+                        <div><input type="checkbox" name="archBox" value="Cummings"> Harry Cummings </div><br>  
+                        <div><input type="checkbox" name="archBox" value="Wesolek"> Morris E. Wesolek </div><br>
+                        <div><input type="checkbox" name="archBox" value="Goddeyne"> J.C. Goddeyne </div><br>
+                        <div><input type="checkbox" name="archBox" value="Robertson"> James Robertson </div><br>
+                        <div><input type="checkbox" name="archBox" value="Perry/Feagley"> Perry/Feagley </div><br>
+                        <div><input type="checkbox" name="archBox" value="Hammerschmidt"> Hammerschmidt </div><br>
+                        <div><input type="checkbox" name="archBox" value="Spence"> James Spence </div><br>
+                        <div><input type="checkbox" name="archBox" value="Stone"> William Stone </div><br>
+                        <div><input type="checkbox" name="archBox" value="Dilloway"> Paul Dilloway </div><br>
+                        <div><input type="checkbox" name="archBox" value="Ebach"> Earl A. Ebach </div><br>
+                        <div><input type="checkbox" name="archBox" value="Boone"> Ralph Boone </div><br>
+                        <div><input type="checkbox" name="archBox" value="Upton"> Harvey Upton </div><br>
+                        <div><input type="checkbox" name="archBox" value="Tilton"> Charles Tilton </div><br>
+                        <div><input type="checkbox" name="archBox" value="Schwitzer"> Dan Schwitzer </div><br>
+                        <div><input type="checkbox" name="archBox" value="McColl"> Alexander McColl </div><br>
+                        <div><input type="checkbox" name="archBox" value="Freudinger"> Ed Freudinger </div><br>
+                        <div><input type="checkbox" name="archBox" value="Sweebe"> Larry Sweebe </div><br>
+                        <div><input type="checkbox" name="archBox" value="Matern"> R.A. Matern </div><br>    
+                        <div><input type="checkbox" name="archBox" value="Tobocman/Lawrence"> Tobocman/Lawrence </div>
+                    </div>
+                </div>
 
-            <i> Additional Architects <br> (3 structures or less per architect) </i> 
-            <div onmouseover="document.body.style.overflow='hidden';" onmouseout="document.body.style.overflow='auto';" id="scrollbox">
-                <input type="checkbox" name="archBox" value="Schwartz/Beach"> Schwartz/Beach <br>
-                <input type="checkbox" name="archBox" value="Hallett/Saro"> Hallett/Saro <br>
-                <input type="checkbox" name="archBox" value="Goodall"> Robert Goodall <br>
-                <input type="checkbox" name="archBox" value="Allison"> Cle Allison <br>
-                <input type="checkbox" name="archBox" value="Goodall/Beach"> Goodall/Beach <br>
-                <input type="checkbox" name="archBox" value="Schulwitz/Virgo"> Schulwitz/Virgo <br>
-                <input type="checkbox" name="archBox" value="Nurmi"> S.A. Nurmi <br>
-                <input type="checkbox" name="archBox" value="Cummings"> Harry Cummings <br>  
-                <input type="checkbox" name="archBox" value="Wesolek"> Morris E. Wesolek <br>
-                <input type="checkbox" name="archBox" value="Goddeyne"> J.C. Goddeyne <br>
-                <input type="checkbox" name="archBox" value="Robertson"> James Robertson <br>
-                <input type="checkbox" name="archBox" value="Perry/Feagley"> Perry/Feagley <br>
-                <input type="checkbox" name="archBox" value="Hammerschmidt"> Hammerschmidt <br>
-                <input type="checkbox" name="archBox" value="Spence"> James Spence <br>
-                <input type="checkbox" name="archBox" value="Stone"> William Stone <br>
-                <input type="checkbox" name="archBox" value="Dilloway"> Paul Dilloway <br>
-                <input type="checkbox" name="archBox" value="Ebach"> Earl A. Ebach <br>
-                <input type="checkbox" name="archBox" value="Boone"> Ralph Boone <br>
-                <input type="checkbox" name="archBox" value="Upton"> Harvey Upton <br>
-                <input type="checkbox" name="archBox" value="Tilton"> Charles Tilton <br>
-                <input type="checkbox" name="archBox" value="Schwitzer"> Dan Schwitzer <br>
-                <input type="checkbox" name="archBox" value="McColl"> Alexander McColl <br>
-                <input type="checkbox" name="archBox" value="Freudinger"> Ed Freudinger <br>
-                <input type="checkbox" name="archBox" value="Sweebe"> Larry Sweebe <br>
-                <input type="checkbox" name="archBox" value="Matern"> R.A. Matern <br>    
-                <input type="checkbox" name="archBox" value="Tobocman/Lawrence"> Tobocman/Lawrence <br>
-            </div>
-            <br>
-            <b>Decade Built</b> <br> 
-            <br>   
+                <br>
+                <div id="dec">
+                    <div id="headSelect">
+                        <b>Decade Built</b>
+                    </div>    
 
-            <input type="checkbox" onClick="decToggle(this)"> Any Decade <br>
-            <input type="checkbox" name="decBox" value="93"> 1930's <br>
-            <input type="checkbox" name="decBox" value="94"> 1940's <br>
-            <input type="checkbox" name="decBox" value="95"> 1950's <br>
-            <input type="checkbox" name="decBox" value="96"> 1960's <br>
-            <input type="checkbox" name="decBox" value="97"> 1970's <br>
-            <input type="checkbox" name="decBox" value="98"> 1980's <br>
-            <input type="checkbox" name="decBox" value="99"> 1990's <br>
-            <input type="checkbox" name="decBox" value="" style="opacity:0; position:absolute; left:100px">        
-            <br>
-
-            <input type="submit" value="Submit">
-            
-        </form>
+                    <div><input type="checkbox" onClick="decToggle(this)"> Any Decade </div><br>
+                    <div><input type="checkbox" name="decBox" value="93"> 1930's </div><br>
+                    <div><input type="checkbox" name="decBox" value="94"> 1940's </div><br>
+                    <div><input type="checkbox" name="decBox" value="95"> 1950's </div><br>
+                    <div><input type="checkbox" name="decBox" value="96"> 1960's </div><br>
+                    <div><input type="checkbox" name="decBox" value="97"> 1970's </div><br>
+                    <div><input type="checkbox" name="decBox" value="98"> 1980's </div><br>
+                    <div><input type="checkbox" name="decBox" value="99"> 1990's </div>
+                    <input type="checkbox" name="decBox" value="" style="opacity:0; position:absolute; left:100px">        
+                </div>
+                <br>
+                <input type="submit" value="Submit" style="border: 1px solid #999999; background: rgb(232, 229, 236); border-radius: 5px; font-size: 18px; height: 33px; width:92px">
+            </form>
+        </div>
     </div>
-
-
 
 </body>
 

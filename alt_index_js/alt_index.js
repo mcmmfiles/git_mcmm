@@ -1,18 +1,22 @@
 const functions = require('firebase-functions');
 const firebase = require('firebase-admin');
-const express = require('express');
+var express = require('express');
 const engines = require('consolidate');
 
-const firebaseApp = firebase.initializeApp(
+var firebaseApp = firebase.initializeApp(
     functions.config().firebase
-);
+); 
 
 function getvalue() {
     const ref = firebaseApp.database().ref();
     return ref.once('value').then(snap => snap.val());
 }
 
-const app = express();
+var path = require('path');
+var app = express();
+
+
+app.use(express.static(path.join(__dirname, '/../public')));
 app.engine('hbs', engines.handlebars);
 app.set('views', './views');
 app.set('view engine', 'hbs');
@@ -37,4 +41,6 @@ app.get('/planned', (request, response) => {
     });
 });
 
+
 exports.app = functions.https.onRequest(app);
+
