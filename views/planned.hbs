@@ -124,7 +124,6 @@
 
             function openMaps() {
                 var link = document.getElementById("openMaps").href;
-                console.log(link);
                 window.open(link);
             }
 
@@ -177,20 +176,79 @@
                     renderDirectionsPolylines(response, polyArray, map);
                     showSteps(response, markerArray, stepDisplay, map);
 
-                    var route = response.routes[0];                   
-                    var link = "https://www.google.com/maps/dir/";
-                    
-                    for (var i = 0; i < route.legs.length; i++) {
-                        link += route.legs[i].start_address;
+                    var useragent = navigator.userAgent;
+                    if (useragent.indexOf('iPhone') != -1 || useragent.indexOf('Android') != -1 ) {
+                        var route = response.routes[0];                 
+                        var link = "https://www.google.com/maps/dir/Current+Location/";
+                        
+                        for (var i = 0; i < route.legs.length; i++) {
+                            link += route.legs[i].start_address;
+                        }
+
+
+                        var edit1 = link.replace(/, USA/g, "/");
+                        var edit2 = edit1.replace(/, /g, "+");
+                        var edit3 = edit2.replace(/\s/g, "+");
+                            
+                        document.getElementById("openMaps").removeAttribute("disabled");
+                        document.getElementById("openMaps").href = edit3;
                     }
+                    else {
+                        if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(function(position) {
+                                var pos = {
+                                    lat: position.coords.latitude,
+                                    lng: position.coords.longitude
+                                };
 
-                    
-                    var edit1 = link.replace(/, USA/g, "/");
-                    var edit2 = edit1.replace(/, /g, "+");
-                    var edit3 = edit2.replace(/\s/g, "+");
+                                var route = response.routes[0];                 
+                                var link = "https://www.google.com/maps/dir/" + pos.lat + "," + pos.lng + "/";
+                                
+                                for (var i = 0; i < route.legs.length; i++) {
+                                    link += route.legs[i].start_address;
+                                }
 
-                    document.getElementById('openMaps').removeAttribute('disabled');
-                    document.getElementById("openMaps").href = edit3;   
+
+                                var edit1 = link.replace(/, USA/g, "/");
+                                var edit2 = edit1.replace(/, /g, "+");
+                                var edit3 = edit2.replace(/\s/g, "+");
+                                    
+                                document.getElementById("openMaps").removeAttribute("disabled");
+                                document.getElementById("openMaps").href = edit3;
+                            }, function() {
+                                var route = response.routes[0];                 
+                                var link = "https://www.google.com/maps/dir/Current+Location/";
+                                
+                                for (var i = 0; i < route.legs.length; i++) {
+                                    link += route.legs[i].start_address;
+                                }
+
+
+                                var edit1 = link.replace(/, USA/g, "/");
+                                var edit2 = edit1.replace(/, /g, "+");
+                                var edit3 = edit2.replace(/\s/g, "+");
+                                    
+                                document.getElementById("openMaps").removeAttribute("disabled");
+                                document.getElementById("openMaps").href = edit3;
+                            });
+                        }
+                        else {
+                            var route = response.routes[0];                 
+                            var link = "https://www.google.com/maps/dir/Current+Location/";
+                            
+                            for (var i = 0; i < route.legs.length; i++) {
+                                link += route.legs[i].start_address;
+                            }
+
+
+                            var edit1 = link.replace(/, USA/g, "/");
+                            var edit2 = edit1.replace(/, /g, "+");
+                            var edit3 = edit2.replace(/\s/g, "+");
+                                
+                            document.getElementById("openMaps").removeAttribute("disabled");
+                            document.getElementById("openMaps").href = edit3;
+                        }
+                    }  
                 } else {
                     window.alert('Unable to calculate route due to ' + status);
                 }
